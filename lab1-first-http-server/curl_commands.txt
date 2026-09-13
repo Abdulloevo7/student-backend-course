@@ -1,0 +1,23 @@
+# Команды для тестирования эндпоинтов лабораторной работы №1
+# Перед запуском выполните: npm run dev  (или npm start)
+
+# 1. Текстовый корневой эндпоинт
+curl http://localhost:3000/
+
+# 2. JSON-эндпоинт (базовый уровень)
+curl http://localhost:3000/api/time
+
+# 3. Сущности среднего уровня
+curl http://localhost:3000/api/users
+curl http://localhost:3000/api/roles
+
+# 4. Сущности продвинутого уровня
+curl http://localhost:3000/api/tasks
+curl http://localhost:3000/api/projects
+
+# 5. Эндпоинт с параметром в пути
+curl http://localhost:3000/api/tasks/1
+curl http://localhost:3000/api/tasks/42
+
+# 6. Проверка обработки 404
+curl -i http://localhost:3000/anything-else
