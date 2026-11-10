@@ -1,0 +1,913 @@
+{
+  "info": {
+    "name": "Lab3 Routing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Базовые маршруты",
+      "item": [
+        {
+          "name": "GET Все задачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Есть count и items\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('count'); pm.expect(d.items).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Задача по id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"id равен 1\", function () { const d = pm.response.json(); pm.expect(d.id).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Комментарии задачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/1/comments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Комментарии задачи 1\", function () { const d = pm.response.json(); pm.expect(d.items).to.be.an('array'); pm.expect(d.items.every(c => c.taskId === 1)).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Задачи проекта",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "1",
+                "tasks"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Все задачи из проекта 1\", function () { const d = pm.response.json(); pm.expect(d.items.every(t => t.projectId === 1)).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Вложенные маршруты",
+      "item": [
+        {
+          "name": "GET Задача в проекте",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/1/tasks/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "1",
+                "tasks",
+                "3"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Задача 3 из проекта 1\", function () { const d = pm.response.json(); pm.expect(d.id).to.eql(3); pm.expect(d.projectId).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Комментарий задачи в проекте",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/1/tasks/5/comments/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "1",
+                "tasks",
+                "5",
+                "comments",
+                "4"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Три параметра пути сработали\", function () { const d = pm.response.json(); pm.expect(d.comment.id).to.eql(4); pm.expect(d.taskId).to.eql(5); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Query-параметры",
+      "item": [
+        {
+          "name": "GET Поиск",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?search=отчёт",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "отчёт"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Найдены только подходящие\", function () { const d = pm.response.json(); pm.expect(d.items.every(t => t.title.toLowerCase().includes('отчёт'))).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Сортировка по приоритету",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?sort=priority&order=desc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "priority"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Первая задача с high\", function () { const d = pm.response.json(); pm.expect(d.items[0].priority).to.eql('high'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Пагинация",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?page=1&limit=3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Поля пагинации\", function () { const d = pm.response.json(); pm.expect(d.items.length).to.eql(3); pm.expect(d).to.include.keys('count', 'page', 'limit', 'totalPages'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Фильтр",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?filter=done:false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "done:false"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Только невыполненные\", function () { const d = pm.response.json(); pm.expect(d.items.every(t => t.done === false)).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Все параметры вместе",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?filter=priority:high&sort=deadline&order=desc&page=1&limit=2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "priority:high"
+                },
+                {
+                  "key": "sort",
+                  "value": "deadline"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Не больше двух задач high\", function () { const d = pm.response.json(); pm.expect(d.items.length).to.be.at.most(2); pm.expect(d.items.every(t => t.priority === 'high')).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Статистика и связи",
+      "item": [
+        {
+          "name": "GET Статистика",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "stats"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Поля статистики\", function () { const d = pm.response.json(); pm.expect(d).to.include.keys('total', 'done', 'notDone', 'byPriority', 'deadline', 'comments'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Связанные задачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/5/related",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "5",
+                "related"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Тот же приоритет, сама задача исключена\", function () { const d = pm.response.json(); pm.expect(d.items.every(t => t.priority === d.priority && t.id !== 5)).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Ошибки",
+      "item": [
+        {
+          "name": "GET id не число (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/abc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "abc"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET id равен нулю (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "0"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Задача не найдена (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks/999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Проект не найден (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/99/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "99",
+                "tasks"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Задача не из этого проекта (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/2/tasks/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "2",
+                "tasks",
+                "3"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Комментарий не найден (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/1/tasks/5/comments/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "1",
+                "tasks",
+                "5",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Неверный taskId в длинном пути (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/1/tasks/x/comments/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "1",
+                "tasks",
+                "x",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Неверное поле sort (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?sort=color",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "color"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Неверный order (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?order=up",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "order",
+                  "value": "up"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET limit больше 100 (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?limit=1000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1000"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET page равен нулю (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Неверный filter (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tasks?filter=done:maybe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "done:maybe"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Несуществующий маршрут (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/anything-else",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "anything-else"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Ошибка сервера (500)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/error-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "error-test"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 500\", function () { pm.response.to.have.status(500); });",
+                  "pm.test(\"Есть поле error\", function () { const d = pm.response.json(); pm.expect(d).to.have.property('error'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    }
+  ]
+}
